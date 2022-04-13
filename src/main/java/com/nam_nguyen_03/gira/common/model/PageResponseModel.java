@@ -4,15 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 public class PageResponseModel<T> {
-	private long pageCurrent;
-	private long totalPage;
+	private int pageCurrent;
+	private int totalPage;
 	private List<T> items = new ArrayList<>();
 
 }
