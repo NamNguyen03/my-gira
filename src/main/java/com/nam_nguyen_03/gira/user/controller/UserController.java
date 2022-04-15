@@ -12,7 +12,9 @@ import com.nam_nguyen_03.gira.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/v1/user")
+@RequestMapping("api/v1/users")
 public class UserController {
     
     @Autowired 
@@ -33,6 +35,21 @@ public class UserController {
 		}
 
         UserResponseDTO rp = userService.updateMyProfile(rq);
+
+        return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
+    }
+
+    @PutMapping("{id}")
+    public Object updateUser(
+        @PathVariable("id") String id,    
+        @Valid @RequestBody UserUpdateDTO rq, 
+        BindingResult result){
+        
+        if(result.hasErrors()) {
+			return ResponseHelper.getResponse(result, HttpStatus.BAD_REQUEST, true);
+		}
+
+        UserResponseDTO rp = userService.updateUser(rq, id);
 
         return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
     }
@@ -56,5 +73,13 @@ public class UserController {
 		));
 
         return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
+    }
+
+    @DeleteMapping("{id}")
+    public Object delete(@PathVariable("id") String id){
+
+        userService.deleteById(id);
+
+        return ResponseHelper.getResponse("", HttpStatus.OK, false);
     }
 }

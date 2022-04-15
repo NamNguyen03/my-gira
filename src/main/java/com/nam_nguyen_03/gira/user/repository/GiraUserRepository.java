@@ -21,6 +21,18 @@ public interface GiraUserRepository extends JpaRepository<GiraUser, UUID>  {
     Optional<GiraUser> findByUsername(String username);
 
     @Query( value =  "Select u from GiraUser u where u.username like %:username% ")
-    Page<GiraUser> SearchByUsername(@Param("username")  String username, Pageable pageable);
+    Page<GiraUser> searchByUsername(@Param("username")  String username, Pageable pageable);
+
+    @Query( value =  "Select u from GiraUser u where u.displayName like %:displayName% ")
+    Page<GiraUser> searchByDisplayName(@Param("displayName") String displayName, Pageable pageable);
+
+    @Query( value =  "Select u from GiraUser u where u.email like %:email% ")
+    Page<GiraUser> searchByEmail(@Param("email") String email, Pageable pageable);
+
+    @Query( value =  "Select u from GiraUser u where u.firstName like %:firstName% ")
+    Page<GiraUser> searchByFirstName(@Param("firstName") String firstName, Pageable pageable);
+
+    @Query( value =  "Select u from GiraUser u where u.lastName like %:lastName% ")
+    Page<GiraUser> searchByLastName(@Param("lastName") String lastName, Pageable pageable);
 
 }

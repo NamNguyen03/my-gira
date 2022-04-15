@@ -1,5 +1,9 @@
 package com.nam_nguyen_03.gira.user.service;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
+
+import javax.validation.Valid;
 
 import com.nam_nguyen_03.gira.common.exception.BusinessException;
 import com.nam_nguyen_03.gira.common.model.PageRequestModel;
@@ -37,9 +41,20 @@ public class UserServiceImpl  implements UserService {
 
         GiraUser userCurrent = repository.findByUsername(usernameCurrent).get();
 
-        if(checkString(rq.getPassword())){
-            userCurrent.setPassword(rq.getPassword());
-        }
+        GiraUser user = setUpdateUser(userCurrent, rq);
+       
+        return UserMapper.INSTANCE.toUserResponseDTO(repository.save(user));
+    }
+    
+    @Override
+    public UserResponseDTO updateUser(@Valid UserUpdateDTO rq, String id) {
+        GiraUser userCurrent = getUserById(id);
+        GiraUser user = setUpdateUser(userCurrent, rq);
+        return UserMapper.INSTANCE.toUserResponseDTO(repository.save(user));
+    }
+
+    private GiraUser setUpdateUser(GiraUser userCurrent, UserUpdateDTO rq) {
+
 
         if(checkString(rq.getDisplayName())){
             userCurrent.setDisplayName(rq.getDisplayName());
@@ -79,9 +94,9 @@ public class UserServiceImpl  implements UserService {
         if(checkString(rq.getFacebook())){
             userCurrent.setFacebook(rq.getFacebook());
         }
-        return UserMapper.INSTANCE.toUserResponseDTO(repository.save(userCurrent));
+        return userCurrent;
     }
-    
+
     boolean checkString(String s){
         if(s == null || s.length() == 0) {
             return false;
@@ -100,27 +115,66 @@ public class UserServiceImpl  implements UserService {
         Pageable pageable = PageRequest.of(page, size);
         Page<GiraUser> rp = null;
 
-        if(fieldNameSort != null && fieldNameSort.length() > 0) {
-            pageable = PageRequest.of(page, size , isAscending ? Sort.by(fieldNameSort).ascending(): Sort.by(fieldNameSort).descending());
+        if (null != fieldNameSort && fieldNameSort.matches("username|displayName|email|firstName|lastName")) {
+            pageable = PageRequest.of(page, size, isAscending ? Sort.by(fieldNameSort).ascending() : Sort.by(fieldNameSort).descending());
+
         }
 
 
         //username
         if("username".equals(fieldNameSearch)){
-            rp =  repository.SearchByUsername(valueSearch, pageable);
+            rp =  repository.searchByUsername(valueSearch, pageable);
         }
 
         //display name
+        if("displayName".equals(fieldNameSearch)){
+            rp =  repository.searchByDisplayName(valueSearch, pageable);
+        }
 
         //email
+        if("email".equals(fieldNameSearch)){
+            rp =  repository.searchByEmail(valueSearch, pageable);
+        }
 
         //first name
+        if("firstName".equals(fieldNameSearch)){
+            rp =  repository.searchByFirstName(valueSearch, pageable);
+        }
 
         //last name
-        if(rp == null ){
-            throw new BusinessException("not content");
+        if("lastName".equals(fieldNameSearch)){
+            rp =  repository.searchByLastName(valueSearch, pageable);
         }
+
+        //if firstName not existed then search all
+        if(rp == null ){
+            rp = repository.findAll(pageable);
+        }
+
         return new PageResponseModel<>(rp.getNumber() + 1, rp.getTotalPages(), 
-            rp.getContent().stream().map(UserMapper.INSTANCE::toUserResponseDTO).collect(Collectors.toList()) );
+            rp.getContent().stream().map(UserMapper.INSTANCE::toUserResponseDTO).collect(Collectors.toList()));
     }
+
+    @Override
+    public void deleteById(String id) {
+
+        repository.delete(getUserById(id));
+    }
+
+    private GiraUser getUserById(String id){
+        UUID uuid;
+        try{
+            uuid = UUID.fromString(id);
+        }catch(Exception e){
+            throw new BusinessException("id invalid");
+        }
+        
+        Optional<GiraUser> userOpt = repository.findById(uuid);
+
+        if(userOpt.isEmpty()){
+            throw new BusinessException("user not found");
+        }
+        return userOpt.get();
+    }
+    
 }

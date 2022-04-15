@@ -10,7 +10,6 @@ import com.nam_nguyen_03.gira.user.model.UserStatus;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -18,15 +17,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.extern.log4j.Log4j2;
 
 @SpringBootTest
 @Transactional
-@Log4j2
 public class GiraUserRepositoryIntegrationTest {
 
     @Autowired
     private GiraUserRepository repository;
+
 
     @BeforeEach
     public void setup(){
@@ -81,11 +79,17 @@ public class GiraUserRepositoryIntegrationTest {
     }
 
     @Test
-    public void existsByEmailIsUsedSearch_theReturnPageUser(){
+    public void existsByUsernameIsUsedSearch_theReturnPageUser(){
         Page<GiraUser> users = repository.searchByUsername("an", PageRequest.of(0, 10, Sort.by("email").ascending()));
         
+        // namTest, toanTest, hauTest,              phanTest
+        //          dTest@gmail.com                 aTest@gmail.com
+
         assertEquals(2 , users.getContent().size(), "search may be failed");
+
         assertEquals("aTest@gmail.com", users.getContent().get(0).getEmail(), "sorted by username may be failed");
+
+        assertEquals("dTest@gmail.com", users.getContent().get(1).getEmail(), "sorted or search by username may be failed");
 
         for(int i = 0 ; i < 30; i++){
             GiraUser user = GiraUser.builder()
@@ -106,4 +110,24 @@ public class GiraUserRepositoryIntegrationTest {
         
     }
     
+
+    // @Test
+    // public void existsByEmailIsUsedSearch_theReturnPageUser(){
+    //     repository.deleteAll();
+    //     user2.setEmail("123nnn@gmail.com");
+    //     user4.setEmail("145nnn@gmail.com");
+    //     repository.saveAndFlush(user1);
+    //     repository.saveAndFlush(user2); 
+    //     repository.saveAndFlush(user3);
+    //     repository.saveAndFlush(user4);
+
+    //     //bbbTest@gmail.com,    123nnn@gmail.com,   aaaTest@gmail.com,  145nnn@gmail.com
+    // }
 }
+
+
+
+
+
+
+
