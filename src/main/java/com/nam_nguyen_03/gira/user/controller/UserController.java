@@ -54,6 +54,14 @@ public class UserController {
         return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
     }
 
+    @GetMapping("{id}")
+    public Object getUserById(@PathVariable("id") String id){
+        
+        UserResponseDTO rp = userService.getUserResponseById(id);
+
+        return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
+    }
+
     @GetMapping()
     public Object search(@RequestParam(value = "pageCurrent", defaultValue = "1") int pageCurrent,
         @RequestParam(value = "itemPerPage", defaultValue = "10") int itemPerPage,

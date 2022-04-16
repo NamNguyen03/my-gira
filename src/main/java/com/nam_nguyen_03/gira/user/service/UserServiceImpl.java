@@ -1,10 +1,8 @@
 package com.nam_nguyen_03.gira.user.service;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import javax.validation.Valid;
-
 import com.nam_nguyen_03.gira.common.exception.BusinessException;
 import com.nam_nguyen_03.gira.common.model.PageRequestModel;
 import com.nam_nguyen_03.gira.common.model.PageResponseModel;
@@ -35,6 +33,12 @@ public class UserServiceImpl  implements UserService {
     @Value("${user.email.existed}")
     private String messagesExistsEmail;
 
+    @Value("${user.email.invalid}")
+    private String messagesEmailInvalid;
+
+    private static final Pattern VALID_EMAIL_ADDRESS_REGEX = 
+    Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+
     @Override
     public UserResponseDTO updateMyProfile(UserUpdateDTO rq) {
         String usernameCurrent = UserPrincipal.getUsernameCurrent();
@@ -47,7 +51,7 @@ public class UserServiceImpl  implements UserService {
     }
     
     @Override
-    public UserResponseDTO updateUser(@Valid UserUpdateDTO rq, String id) {
+    public UserResponseDTO updateUser(UserUpdateDTO rq, String id) {
         GiraUser userCurrent = getUserById(id);
         GiraUser user = setUpdateUser(userCurrent, rq);
         return UserMapper.INSTANCE.toUserResponseDTO(repository.save(user));
@@ -61,7 +65,11 @@ public class UserServiceImpl  implements UserService {
         }
 
         if(checkString(rq.getEmail())){
-            if(repository.existsByEmail(rq.getEmail())){
+            if( !VALID_EMAIL_ADDRESS_REGEX.matcher(rq.getEmail()).find()){
+                throw new BusinessException(messagesEmailInvalid);
+            }
+
+            if(!userCurrent.getEmail().equals(rq.getEmail()) && repository.existsByEmail(rq.getEmail())){
                 throw new BusinessException(messagesExistsEmail);
             }
             userCurrent.setEmail(rq.getEmail());
@@ -175,6 +183,12 @@ public class UserServiceImpl  implements UserService {
             throw new BusinessException("user not found");
         }
         return userOpt.get();
+    }
+
+    @Override
+    public UserResponseDTO getUserResponseById(String id) {
+        
+        return UserMapper.INSTANCE.toUserResponseDTO(getUserById(id));
     }
     
 }

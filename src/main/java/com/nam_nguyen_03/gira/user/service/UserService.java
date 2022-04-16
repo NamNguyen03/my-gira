@@ -1,7 +1,5 @@
 package com.nam_nguyen_03.gira.user.service;
 
-import javax.validation.Valid;
-
 import com.nam_nguyen_03.gira.common.model.PageRequestModel;
 import com.nam_nguyen_03.gira.common.model.PageResponseModel;
 import com.nam_nguyen_03.gira.user.dto.UserResponseDTO;
@@ -16,5 +14,8 @@ public interface UserService {
     void deleteById(String id);
 
     UserResponseDTO updateUser( UserUpdateDTO rq, String id);
+
+    UserResponseDTO getUserResponseById(String id);
+    
     
 }
