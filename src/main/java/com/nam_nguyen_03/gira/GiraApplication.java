@@ -9,5 +9,5 @@ public class GiraApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(GiraApplication.class, args);
 	}
-
+	
 }
