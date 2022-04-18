@@ -16,6 +16,8 @@ public interface UserService {
     UserResponseDTO updateUser( UserUpdateDTO rq, String id);
 
     UserResponseDTO getUserResponseById(String id);
+
+    UserResponseDTO addGroup(String idUser, String idGroup);
     
     
 }

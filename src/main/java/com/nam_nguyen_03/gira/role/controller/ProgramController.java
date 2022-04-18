@@ -1,18 +1,18 @@
 package com.nam_nguyen_03.gira.role.controller;
+
 import javax.validation.Valid;
 
 import com.nam_nguyen_03.gira.common.model.PageRequestModel;
 import com.nam_nguyen_03.gira.common.model.PageResponseModel;
 import com.nam_nguyen_03.gira.common.util.ResponseHelper;
-import com.nam_nguyen_03.gira.role.dto.RoleDTO;
-import com.nam_nguyen_03.gira.role.dto.RoleResponseDTO;
-import com.nam_nguyen_03.gira.role.service.RoleService;
+import com.nam_nguyen_03.gira.role.dto.ProgramDTO;
+import com.nam_nguyen_03.gira.role.dto.ProgramResponseDTO;
+import com.nam_nguyen_03.gira.role.service.ProgramService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,20 +20,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/v1/roles")
-public class RoleController {
-    
+@RequestMapping("api/v1/programs")
+public class ProgramController {
+
     @Autowired
-    private RoleService service;
+    private ProgramService service;
 
     @PostMapping
-    public Object addRole(@Valid @RequestBody RoleDTO role, BindingResult result){
+    public Object addRole(@Valid @RequestBody ProgramDTO program, BindingResult result){
         
         if(result.hasErrors()) {
 			return ResponseHelper.getResponse(result, HttpStatus.BAD_REQUEST, true);
 		}
 
-        RoleResponseDTO rp  = service.save(role);
+        ProgramResponseDTO rp  = service.save(program);
 
         return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
     }
@@ -47,7 +47,7 @@ public class RoleController {
         @RequestParam(value = "valueFieldNameSearch", required = false) String valueFieldNameSearch
         ){
         
-        PageResponseModel<RoleResponseDTO> rp = service.search(new PageRequestModel(
+        PageResponseModel<ProgramResponseDTO> rp = service.search(new PageRequestModel(
             pageCurrent,
             itemPerPage,
             fieldNameSort,
@@ -59,10 +59,4 @@ public class RoleController {
         return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
     }
 
-    @PostMapping("{idRole}/{idProgram}")
-    public Object insertProgram(@PathVariable("idRole") String idRole, @PathVariable("idProgram") String idProgram){
-        RoleResponseDTO rp = service.insertProgram(idRole, idProgram);
-        
-        return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
-    }
 }

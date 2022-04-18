@@ -1,11 +1,13 @@
 package com.nam_nguyen_03.gira.user.model;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
-import com.nam_nguyen_03.gira.common.model.BaseEntity;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
+import javax.persistence.*;
+import com.nam_nguyen_03.gira.common.model.BaseEntity;
+import com.nam_nguyen_03.gira.role.model.GiraGroup;
+
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -43,4 +45,18 @@ public class GiraUser extends BaseEntity {
 	private String hobbies;
 	
 	private String facebook;
+
+	@Builder.Default
+	@ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
+	@JoinTable(
+		name 		= "gira_group_user",
+		joinColumns = @JoinColumn(name = "user_id"),
+		inverseJoinColumns = @JoinColumn(name = "group_id")
+	)
+	private Set<GiraGroup> groups = new LinkedHashSet();
+
+	public void addGroup( GiraGroup group ) {
+		groups.add(group);
+		group.getUsers().add(this);
+	}
 }
