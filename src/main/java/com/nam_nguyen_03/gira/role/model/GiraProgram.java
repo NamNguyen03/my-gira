@@ -41,10 +41,4 @@ public class GiraProgram  extends BaseEntity  {
 	@ManyToMany(mappedBy = "programs")
 	@Builder.Default
     private Set<GiraRole> roles = new LinkedHashSet();
-
-    private String identityKey;
-
-    public void generateIdentityKey(){
-        identityKey = module.name().toLowerCase() + "_"  + type.name().toLowerCase();
-    }
 }
