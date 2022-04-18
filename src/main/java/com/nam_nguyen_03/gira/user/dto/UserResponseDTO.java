@@ -1,7 +1,9 @@
 package com.nam_nguyen_03.gira.user.dto;
 
+import java.util.Set;
 import java.util.UUID;
 
+import com.nam_nguyen_03.gira.role.dto.GroupResponseDTO;
 import com.nam_nguyen_03.gira.user.model.UserStatus;
 
 import lombok.*;
@@ -34,4 +36,6 @@ public class UserResponseDTO {
 	private String facebook;
 
     private UserStatus status;
+
+	private Set<GroupResponseDTO> groups;
 }

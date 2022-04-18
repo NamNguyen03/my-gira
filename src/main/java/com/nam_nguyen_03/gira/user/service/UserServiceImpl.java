@@ -1,12 +1,13 @@
 package com.nam_nguyen_03.gira.user.service;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import com.nam_nguyen_03.gira.common.exception.BusinessException;
 import com.nam_nguyen_03.gira.common.model.PageRequestModel;
 import com.nam_nguyen_03.gira.common.model.PageResponseModel;
+import com.nam_nguyen_03.gira.common.util.ServiceHelper;
 import com.nam_nguyen_03.gira.common.util.UserPrincipal;
+import com.nam_nguyen_03.gira.role.model.GiraGroup;
+import com.nam_nguyen_03.gira.role.repository.GiraGroupRepository;
 import com.nam_nguyen_03.gira.user.dto.UserResponseDTO;
 import com.nam_nguyen_03.gira.user.dto.UserUpdateDTO;
 import com.nam_nguyen_03.gira.user.mapper.UserMapper;
@@ -28,13 +29,31 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl  implements UserService {
 
     @Autowired
-    private GiraUserRepository repository;
+    private GiraUserRepository giraUserRepository;
 
     @Value("${user.email.existed}")
     private String messagesExistsEmail;
 
     @Value("${user.email.invalid}")
     private String messagesEmailInvalid;
+
+    @Value("${entity.id.invalid}")
+    private String errorsIdInvalid;
+
+    @Value("${user.not-found}")
+    private String errorsUserNotFound;
+
+    @Autowired
+    private GiraGroupRepository giraGroupRepository;
+
+    @Autowired
+    private ServiceHelper<GiraGroup> serviceGroupHelper;
+
+    @Autowired
+    private ServiceHelper<GiraUser> serviceUserHelper;
+
+    @Value("${group.not-found}")
+    private String errorsGroupNotFound;
 
     private static final Pattern VALID_EMAIL_ADDRESS_REGEX = 
     Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
@@ -43,18 +62,18 @@ public class UserServiceImpl  implements UserService {
     public UserResponseDTO updateMyProfile(UserUpdateDTO rq) {
         String usernameCurrent = UserPrincipal.getUsernameCurrent();
 
-        GiraUser userCurrent = repository.findByUsername(usernameCurrent).get();
+        GiraUser userCurrent = giraUserRepository.findByUsername(usernameCurrent).get();
 
         GiraUser user = setUpdateUser(userCurrent, rq);
        
-        return UserMapper.INSTANCE.toUserResponseDTO(repository.save(user));
+        return UserMapper.INSTANCE.toUserResponseDTO(giraUserRepository.save(user));
     }
     
     @Override
     public UserResponseDTO updateUser(UserUpdateDTO rq, String id) {
-        GiraUser userCurrent = getUserById(id);
+        GiraUser userCurrent = serviceUserHelper.getEntityById(id, giraUserRepository, errorsUserNotFound);
         GiraUser user = setUpdateUser(userCurrent, rq);
-        return UserMapper.INSTANCE.toUserResponseDTO(repository.save(user));
+        return UserMapper.INSTANCE.toUserResponseDTO(giraUserRepository.save(user));
     }
 
     private GiraUser setUpdateUser(GiraUser userCurrent, UserUpdateDTO rq) {
@@ -69,7 +88,7 @@ public class UserServiceImpl  implements UserService {
                 throw new BusinessException(messagesEmailInvalid);
             }
 
-            if(!userCurrent.getEmail().equals(rq.getEmail()) && repository.existsByEmail(rq.getEmail())){
+            if(!userCurrent.getEmail().equals(rq.getEmail()) && giraUserRepository.existsByEmail(rq.getEmail())){
                 throw new BusinessException(messagesExistsEmail);
             }
             userCurrent.setEmail(rq.getEmail());
@@ -131,32 +150,32 @@ public class UserServiceImpl  implements UserService {
 
         //username
         if("username".equals(fieldNameSearch)){
-            rp =  repository.searchByUsername(valueSearch, pageable);
+            rp =  giraUserRepository.searchByUsername(valueSearch, pageable);
         }
 
         //display name
         if("displayName".equals(fieldNameSearch)){
-            rp =  repository.searchByDisplayName(valueSearch, pageable);
+            rp =  giraUserRepository.searchByDisplayName(valueSearch, pageable);
         }
 
         //email
         if("email".equals(fieldNameSearch)){
-            rp =  repository.searchByEmail(valueSearch, pageable);
+            rp =  giraUserRepository.searchByEmail(valueSearch, pageable);
         }
 
         //first name
         if("firstName".equals(fieldNameSearch)){
-            rp =  repository.searchByFirstName(valueSearch, pageable);
+            rp =  giraUserRepository.searchByFirstName(valueSearch, pageable);
         }
 
         //last name
         if("lastName".equals(fieldNameSearch)){
-            rp =  repository.searchByLastName(valueSearch, pageable);
+            rp =  giraUserRepository.searchByLastName(valueSearch, pageable);
         }
 
         //if firstName not existed then search all
         if(rp == null ){
-            rp = repository.findAll(pageable);
+            rp = giraUserRepository.findAll(pageable);
         }
 
         return new PageResponseModel<>(rp.getNumber() + 1, rp.getTotalPages(), 
@@ -166,29 +185,25 @@ public class UserServiceImpl  implements UserService {
     @Override
     public void deleteById(String id) {
 
-        repository.delete(getUserById(id));
-    }
-
-    private GiraUser getUserById(String id){
-        UUID uuid;
-        try{
-            uuid = UUID.fromString(id);
-        }catch(Exception e){
-            throw new BusinessException("id invalid");
-        }
-        
-        Optional<GiraUser> userOpt = repository.findById(uuid);
-
-        if(userOpt.isEmpty()){
-            throw new BusinessException("user not found");
-        }
-        return userOpt.get();
+        giraUserRepository.delete(serviceUserHelper.getEntityById(id, giraUserRepository, errorsUserNotFound));
     }
 
     @Override
     public UserResponseDTO getUserResponseById(String id) {
         
-        return UserMapper.INSTANCE.toUserResponseDTO(getUserById(id));
+        return UserMapper.INSTANCE.toUserResponseDTO(serviceUserHelper.getEntityById(id, giraUserRepository, errorsUserNotFound));
+    }
+
+    @Override
+    public UserResponseDTO addGroup(String idUser, String idGroup) {
+        
+        GiraUser user = serviceUserHelper.getEntityById(idUser, giraUserRepository, errorsUserNotFound);
+        GiraGroup group = serviceGroupHelper.getEntityById(idGroup, giraGroupRepository, errorsGroupNotFound);
+
+        user.addGroup(group);
+
+        return UserMapper.INSTANCE.toUserResponseDTO(giraUserRepository.save(user));
     }
     
+
 }
