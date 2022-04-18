@@ -22,5 +22,4 @@ public class ProgramResponseDTO {
 	
 	private String description;
 
-    private String identityKey;
 }

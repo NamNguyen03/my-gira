@@ -19,4 +19,7 @@ public interface ProgramRepository extends JpaRepository<GiraProgram, UUID>  {
 
     boolean existsByName(String name);
 
+    @Query( value = "Select count(p)>0 from GiraProgram p left join p.roles r left join r.groups g left join g.users u where u.username = :username and p.name = :name and u.status = 'ACTIVE' ")
+    boolean existsByNameProgramAndUsername(@Param("name") String name, @Param("username") String username);
+
 }

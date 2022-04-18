@@ -53,7 +53,6 @@ public class ProgramServiceImpl implements ProgramService {
     public ProgramResponseDTO save(ProgramDTO program) {
     
         GiraProgram rq = ProgramMapper.INSTANCE.toModel(program);
-        rq.generateIdentityKey();
         
         return ProgramMapper.INSTANCE.toProgramResponseDTO(programRepository.save(rq)) ;
     } 
