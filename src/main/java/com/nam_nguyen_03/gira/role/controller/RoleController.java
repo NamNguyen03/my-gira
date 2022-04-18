@@ -7,6 +7,7 @@ import com.nam_nguyen_03.gira.common.util.ResponseHelper;
 import com.nam_nguyen_03.gira.role.dto.RoleDTO;
 import com.nam_nguyen_03.gira.role.dto.RoleResponseDTO;
 import com.nam_nguyen_03.gira.role.service.RoleService;
+import com.nam_nguyen_03.gira.security.authorization.GiraPermission;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ public class RoleController {
     @Autowired
     private RoleService service;
 
+    // @GiraPermission("addRole")
     @PostMapping
     public Object addRole(@Valid @RequestBody RoleDTO role, BindingResult result){
         
@@ -38,6 +40,7 @@ public class RoleController {
         return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
     }
 
+    @GiraPermission("searchRole")
     @GetMapping
     public Object search(@RequestParam(value = "pageCurrent", defaultValue = "1") int pageCurrent,
         @RequestParam(value = "itemPerPage", defaultValue = "10") int itemPerPage,
@@ -59,6 +62,7 @@ public class RoleController {
         return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
     }
 
+    // @GiraPermission("insertProgramRole")
     @PostMapping("{idRole}/{idProgram}")
     public Object insertProgram(@PathVariable("idRole") String idRole, @PathVariable("idProgram") String idProgram){
         RoleResponseDTO rp = service.insertProgram(idRole, idProgram);

@@ -8,11 +8,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class ExceptionHelper {
-    private static final String MESSAGE_UNAUTHORIZED = "You do not have permission to call this operation. Please contact admin to get suitable permission.";
 
 	@ExceptionHandler(UnauthorizedException.class)
-	public Object handlerUnauthorizedException () {
-		return ResponseHelper.getResponse(MESSAGE_UNAUTHORIZED, HttpStatus.UNAUTHORIZED, true);
+	public Object handlerUnauthorizedException (UnauthorizedException ex) {
+		return ResponseHelper.getResponse(ex.getMessage(), HttpStatus.UNAUTHORIZED, true);
 	}
 
 	@ExceptionHandler(BusinessException.class)
