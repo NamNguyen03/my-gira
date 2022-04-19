@@ -27,8 +27,7 @@ public class ProgramController {
     private ProgramService service;
 
     @PostMapping
-    public Object addRole(@Valid @RequestBody ProgramDTO program, BindingResult result){
-        
+    public Object addProgram(@Valid @RequestBody ProgramDTO program, BindingResult result){
         if(result.hasErrors()) {
 			return ResponseHelper.getResponse(result, HttpStatus.BAD_REQUEST, true);
 		}

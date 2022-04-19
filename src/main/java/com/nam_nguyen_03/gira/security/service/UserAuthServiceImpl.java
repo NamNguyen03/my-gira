@@ -46,15 +46,12 @@ public class UserAuthServiceImpl implements UserAuthService{
 
     @Override
     public String login(LoginDTO rq) {
-
         if(!userRepository.existsByUsername(rq.getUsername())){
-            throw new BusinessException(messageUserNotExisted);
+            throw new BusinessException(messagePasswordNotEquals);
         }
 
-       // get user information
 		Optional<GiraUser> userOpt = userRepository.findByUsername(rq.getUsername());
 		
-		// check password
 		String encodedPassword = userOpt.get().getPassword();
 		
 		if(!encoder.matches(rq.getPassword(), encodedPassword)) {
