@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import com.nam_nguyen_03.gira.common.model.PageRequestModel;
 import com.nam_nguyen_03.gira.common.model.PageResponseModel;
+import com.nam_nguyen_03.gira.role.repository.ProgramRepository;
 import com.nam_nguyen_03.gira.user.service.UserService;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -26,6 +27,9 @@ public class UserControllerIntegrationTest {
     
     @MockBean
 	private UserService service;
+
+    @MockBean
+    private ProgramRepository programRepository;
 	
 	@Autowired
 	private MockMvc mockMvc;
@@ -34,7 +38,8 @@ public class UserControllerIntegrationTest {
     @Test
     public void givenJsonObject_whenExistsUserIsUsedSearchUser_theReturnPageUser() throws Exception{
         when(service.search(new PageRequestModel(1, 10, null, true, null, null))).thenReturn(new PageResponseModel<>(1,10,new ArrayList<>()));
-		
+        when(programRepository.existsByNameProgramAndUsername("searchUser", "nam")).thenReturn(true);
+        
         String json = "content\":{\"pageCurrent\":1,\"totalPage\":10,\"items\":[]";
 
 		mockMvc.perform(get("/api/v1/users"))
