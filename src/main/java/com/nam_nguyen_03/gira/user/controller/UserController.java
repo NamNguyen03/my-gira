@@ -114,7 +114,7 @@ public class UserController {
     }
 
     @GiraPermission("updateUser")
-    @PostMapping("update-status/{id}")
+    @PutMapping("update-status/{id}")
     public Object updateStatus(@RequestBody String status, @PathVariable("id") String id){
 
         UserResponseDTO rp = userService.updateStatus(id, status);
@@ -122,7 +122,7 @@ public class UserController {
         return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
     }
 
-    @PostMapping(value="me/update-password")
+    @PutMapping(value="me/update-password")
     public Object updateMyPassword(@RequestBody String password){
         
         userService.updateMyPassword(password);
@@ -131,7 +131,7 @@ public class UserController {
     }
     
     @GiraPermission("updatePasswordUser")
-    @PostMapping("update-password/{id}")
+    @PutMapping("update-password/{id}")
     public Object UpdatePassword(@RequestBody String password, @PathVariable("id") String id){
         
         userService.updatePassword(id, password);
