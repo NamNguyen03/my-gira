@@ -18,6 +18,14 @@ public interface UserService {
     UserResponseDTO getUserResponseById(String id);
 
     UserResponseDTO addGroup(String idUser, String idGroup);
+
+    UserResponseDTO getMyProfile();
+
+    UserResponseDTO updateStatus(String id, String status);
+
+    void updateMyPassword(String password);
+
+    void updatePassword(String id, String password);
     
     
 }

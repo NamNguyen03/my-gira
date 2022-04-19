@@ -5,6 +5,7 @@ import javax.validation.Valid;
 import com.nam_nguyen_03.gira.common.model.PageRequestModel;
 import com.nam_nguyen_03.gira.common.model.PageResponseModel;
 import com.nam_nguyen_03.gira.common.util.ResponseHelper;
+import com.nam_nguyen_03.gira.security.authorization.GiraPermission;
 import com.nam_nguyen_03.gira.user.dto.UserResponseDTO;
 import com.nam_nguyen_03.gira.user.dto.UserUpdateDTO;
 import com.nam_nguyen_03.gira.user.service.UserService;
@@ -29,6 +30,7 @@ public class UserController {
     @Autowired 
     private UserService userService;
 
+    
     @PutMapping("me")
     public Object updateMyProfile(@Valid @RequestBody UserUpdateDTO rq, BindingResult result){
         if(result.hasErrors()) {
@@ -40,6 +42,7 @@ public class UserController {
         return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
     }
 
+    @GiraPermission("updateUser")
     @PutMapping("{id}")
     public Object updateUser(
         @PathVariable("id") String id,    
@@ -55,6 +58,7 @@ public class UserController {
         return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
     }
 
+    @GiraPermission("getByIdUser")
     @GetMapping("{id}")
     public Object getUserById(@PathVariable("id") String id){
         
@@ -63,6 +67,7 @@ public class UserController {
         return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
     }
 
+    @GiraPermission("searchUser")
     @GetMapping()
     public Object search(@RequestParam(value = "pageCurrent", defaultValue = "1") int pageCurrent,
         @RequestParam(value = "itemPerPage", defaultValue = "10") int itemPerPage,
@@ -84,6 +89,7 @@ public class UserController {
         return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
     }
 
+    @GiraPermission("deleteUser")
     @DeleteMapping("{id}")
     public Object delete(@PathVariable("id") String id){
 
@@ -97,5 +103,39 @@ public class UserController {
         UserResponseDTO rp = userService.addGroup(idUser, idGroup);
 
         return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
+    }
+
+    @GetMapping("me")
+    public Object getMyProfile(){
+
+        UserResponseDTO rp = userService.getMyProfile();
+
+        return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
+    }
+
+    @GiraPermission("updateUser")
+    @PostMapping("update-status/{id}")
+    public Object updateStatus(@RequestBody String status, @PathVariable("id") String id){
+
+        UserResponseDTO rp = userService.updateStatus(id, status);
+
+        return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
+    }
+
+    @PostMapping(value="me/update-password")
+    public Object updateMyPassword(@RequestBody String password){
+        
+        userService.updateMyPassword(password);
+
+        return ResponseHelper.getResponse("", HttpStatus.OK, false);
+    }
+    
+    @GiraPermission("updatePasswordUser")
+    @PostMapping("update-password/{id}")
+    public Object UpdatePassword(@RequestBody String password, @PathVariable("id") String id){
+        
+        userService.updatePassword(id, password);
+
+        return ResponseHelper.getResponse("", HttpStatus.OK, false);
     }
 }

@@ -12,6 +12,7 @@ import com.nam_nguyen_03.gira.user.dto.UserResponseDTO;
 import com.nam_nguyen_03.gira.user.dto.UserUpdateDTO;
 import com.nam_nguyen_03.gira.user.mapper.UserMapper;
 import com.nam_nguyen_03.gira.user.model.GiraUser;
+import com.nam_nguyen_03.gira.user.model.UserStatus;
 import com.nam_nguyen_03.gira.user.repository.GiraUserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -42,6 +44,9 @@ public class UserServiceImpl  implements UserService {
 
     @Value("${user.not-found}")
     private String errorsUserNotFound;
+
+    @Autowired
+    private PasswordEncoder encoder;
 
     @Autowired
     private GiraGroupRepository giraGroupRepository;
@@ -124,7 +129,7 @@ public class UserServiceImpl  implements UserService {
         return userCurrent;
     }
 
-    boolean checkString(String s){
+    private boolean checkString(String s){
         if(s == null || s.length() == 0) {
             return false;
         }
@@ -146,7 +151,6 @@ public class UserServiceImpl  implements UserService {
             pageable = PageRequest.of(page, size, isAscending ? Sort.by(fieldNameSort).ascending() : Sort.by(fieldNameSort).descending());
 
         }
-
 
         //username
         if("username".equals(fieldNameSearch)){
@@ -204,6 +208,54 @@ public class UserServiceImpl  implements UserService {
 
         return UserMapper.INSTANCE.toUserResponseDTO(giraUserRepository.save(user));
     }
-    
 
+    @Override
+    public UserResponseDTO getMyProfile() {
+        String usernameCurrent = UserPrincipal.getUsernameCurrent();
+
+        return UserMapper.INSTANCE.toUserResponseDTO( giraUserRepository.findByUsername(usernameCurrent).get());
+    }
+
+    @Override
+    public UserResponseDTO updateStatus(String id, String status) {
+
+        GiraUser user = serviceUserHelper.getEntityById(id, giraUserRepository, errorsUserNotFound);
+
+        if(UserStatus.ACTIVE.toString().equals(status.toUpperCase())){
+            user.setStatus(UserStatus.ACTIVE);
+        }
+
+        if(UserStatus.PERMANENT_BLOCKED.toString().equals(status.toUpperCase())){
+            user.setStatus(UserStatus.PERMANENT_BLOCKED);
+        }
+
+        if(UserStatus.TEMPORARY_BLOCKED.toString().equals(status.toUpperCase())){
+            user.setStatus(UserStatus.TEMPORARY_BLOCKED);
+        }     
+
+       return UserMapper.INSTANCE.toUserResponseDTO(giraUserRepository.save(user));
+    }
+
+    @Override
+    public void updateMyPassword(String password) {
+
+        String usernameCurrent = UserPrincipal.getUsernameCurrent();
+
+        GiraUser userCurrent = giraUserRepository.findByUsername(usernameCurrent).get();
+
+        userCurrent.setPassword(encoder.encode(password));
+        giraUserRepository.save(userCurrent);
+    }
+
+    @Override
+    public void updatePassword(String id, String password) {
+        GiraUser user = serviceUserHelper.getEntityById(id, giraUserRepository, errorsUserNotFound);
+
+        user.setPassword(encoder.encode(password));
+
+        giraUserRepository.save(user);
+
+    }
+    
+    
 }
