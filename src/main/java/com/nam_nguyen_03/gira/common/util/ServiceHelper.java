@@ -34,4 +34,11 @@ public class ServiceHelper<T extends BaseEntity> {
         }
         return roleOpt.get();
     }
+
+    public boolean isValidString(String s) {
+        if(s == null || s.length() == 0) {
+            return false;
+        }
+        return true;
+    }
 }

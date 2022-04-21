@@ -6,6 +6,7 @@ import com.nam_nguyen_03.gira.common.model.PageRequestModel;
 import com.nam_nguyen_03.gira.common.model.PageResponseModel;
 import com.nam_nguyen_03.gira.common.util.ResponseHelper;
 import com.nam_nguyen_03.gira.security.authorization.GiraPermission;
+import com.nam_nguyen_03.gira.user.dto.UserDetailsResponseDTO;
 import com.nam_nguyen_03.gira.user.dto.UserResponseDTO;
 import com.nam_nguyen_03.gira.user.dto.UserUpdateDTO;
 import com.nam_nguyen_03.gira.user.service.UserService;
@@ -62,7 +63,7 @@ public class UserController {
     @GetMapping("{id}")
     public Object getUserById(@PathVariable("id") String id){
         
-        UserResponseDTO rp = userService.getUserResponseById(id);
+        UserDetailsResponseDTO rp = userService.getUserResponseById(id);
 
         return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
     }
@@ -98,9 +99,10 @@ public class UserController {
         return ResponseHelper.getResponse("", HttpStatus.OK, false);
     }
 
+    @GiraPermission("insertGroupIntoUser")
     @PostMapping("{idUser}/{idGroup}")
-    public Object insertRole(@PathVariable("idUser") String idUser, @PathVariable("idGroup") String idGroup){
-        UserResponseDTO rp = userService.addGroup(idUser, idGroup);
+    public Object insertGroup(@PathVariable("idUser") String idUser, @PathVariable("idGroup") String idGroup){
+        UserDetailsResponseDTO rp = userService.addGroup(idUser, idGroup);
 
         return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
     }
@@ -108,12 +110,12 @@ public class UserController {
     @GetMapping("me")
     public Object getMyProfile(){
 
-        UserResponseDTO rp = userService.getMyProfile();
+        UserDetailsResponseDTO rp = userService.getMyProfile();
 
         return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
     }
 
-    @GiraPermission("updateUser")
+    @GiraPermission("updateStatusUser")
     @PutMapping("update-status/{id}")
     public Object updateStatus(@RequestBody String status, @PathVariable("id") String id){
 
@@ -137,5 +139,13 @@ public class UserController {
         userService.updatePassword(id, password);
 
         return ResponseHelper.getResponse("", HttpStatus.OK, false);
+    }
+
+    @GiraPermission("removeRoleInUser")
+    @DeleteMapping("{idUser}/{idGroup}")
+    public Object removeGroup(@PathVariable("idUser") String idUser, @PathVariable("idGroup") String idGroup){
+        UserDetailsResponseDTO rp = userService.removeGroup(idUser, idGroup);
+
+        return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
     }
 }

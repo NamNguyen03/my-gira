@@ -1,17 +1,15 @@
 package com.nam_nguyen_03.gira.user.dto;
 
-import java.util.Set;
 import java.util.UUID;
 
-import com.nam_nguyen_03.gira.role.dto.GroupResponseDTO;
 import com.nam_nguyen_03.gira.user.model.UserStatus;
 
 import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-@Builder
+@Getter
+@Setter
 public class UserResponseDTO {
     private UUID id;
 
@@ -37,5 +35,4 @@ public class UserResponseDTO {
 
     private UserStatus status;
 
-	private Set<GroupResponseDTO> groups;
 }

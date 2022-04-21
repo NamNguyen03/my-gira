@@ -8,6 +8,7 @@ import com.nam_nguyen_03.gira.common.util.ServiceHelper;
 import com.nam_nguyen_03.gira.common.util.UserPrincipal;
 import com.nam_nguyen_03.gira.role.model.GiraGroup;
 import com.nam_nguyen_03.gira.role.repository.GiraGroupRepository;
+import com.nam_nguyen_03.gira.user.dto.UserDetailsResponseDTO;
 import com.nam_nguyen_03.gira.user.dto.UserResponseDTO;
 import com.nam_nguyen_03.gira.user.dto.UserUpdateDTO;
 import com.nam_nguyen_03.gira.user.mapper.UserMapper;
@@ -83,12 +84,11 @@ public class UserServiceImpl  implements UserService {
 
     private GiraUser setUpdateUser(GiraUser userCurrent, UserUpdateDTO rq) {
 
-
-        if(checkString(rq.getDisplayName())){
+        if(serviceUserHelper.isValidString(rq.getDisplayName())){
             userCurrent.setDisplayName(rq.getDisplayName());
         }
 
-        if(checkString(rq.getEmail())){
+        if(serviceUserHelper.isValidString(rq.getEmail())){
             if( !VALID_EMAIL_ADDRESS_REGEX.matcher(rq.getEmail()).find()){
                 throw new BusinessException(messagesEmailInvalid);
             }
@@ -99,42 +99,36 @@ public class UserServiceImpl  implements UserService {
             userCurrent.setEmail(rq.getEmail());
         }
 
-        if(checkString(rq.getFirstName())){
+        if(serviceUserHelper.isValidString(rq.getFirstName())){
             userCurrent.setFirstName(rq.getFirstName());
         }
 
-        if(checkString(rq.getLastName())){
+        if(serviceUserHelper.isValidString(rq.getLastName())){
             userCurrent.setLastName(rq.getLastName());
         }
 
-        if(checkString(rq.getAvatar())){
+        if(serviceUserHelper.isValidString(rq.getAvatar())){
             userCurrent.setAvatar(rq.getAvatar());
         }
 
-        if(checkString(rq.getDepartment())){
+        if(serviceUserHelper.isValidString(rq.getDepartment())){
             userCurrent.setDepartment(rq.getDepartment());
         }
 
-        if(checkString(rq.getMajor())){
+        if(serviceUserHelper.isValidString(rq.getMajor())){
             userCurrent.setMajor(rq.getMajor());
         }
 
-        if(checkString(rq.getHobbies())){
+        if(serviceUserHelper.isValidString(rq.getHobbies())){
             userCurrent.setHobbies(rq.getHobbies());
         }
 
-        if(checkString(rq.getFacebook())){
+        if(serviceUserHelper.isValidString(rq.getFacebook())){
             userCurrent.setFacebook(rq.getFacebook());
         }
         return userCurrent;
     }
 
-    private boolean checkString(String s){
-        if(s == null || s.length() == 0) {
-            return false;
-        }
-        return true;
-    }
 
     @Override
     public PageResponseModel<UserResponseDTO> search(PageRequestModel pageRequestModel) {
@@ -193,27 +187,27 @@ public class UserServiceImpl  implements UserService {
     }
 
     @Override
-    public UserResponseDTO getUserResponseById(String id) {
+    public UserDetailsResponseDTO getUserResponseById(String id) {
         
-        return UserMapper.INSTANCE.toUserResponseDTO(serviceUserHelper.getEntityById(id, giraUserRepository, errorsUserNotFound));
+        return UserMapper.INSTANCE.toUserDetailsResponseDTO(serviceUserHelper.getEntityById(id, giraUserRepository, errorsUserNotFound));
     }
 
     @Override
-    public UserResponseDTO addGroup(String idUser, String idGroup) {
+    public UserDetailsResponseDTO addGroup(String idUser, String idGroup) {
         
         GiraUser user = serviceUserHelper.getEntityById(idUser, giraUserRepository, errorsUserNotFound);
         GiraGroup group = serviceGroupHelper.getEntityById(idGroup, giraGroupRepository, errorsGroupNotFound);
 
         user.addGroup(group);
 
-        return UserMapper.INSTANCE.toUserResponseDTO(giraUserRepository.save(user));
+        return UserMapper.INSTANCE.toUserDetailsResponseDTO(giraUserRepository.save(user));
     }
 
     @Override
-    public UserResponseDTO getMyProfile() {
+    public UserDetailsResponseDTO getMyProfile() {
         String usernameCurrent = UserPrincipal.getUsernameCurrent();
 
-        return UserMapper.INSTANCE.toUserResponseDTO( giraUserRepository.findByUsername(usernameCurrent).get());
+        return UserMapper.INSTANCE.toUserDetailsResponseDTO( giraUserRepository.findByUsername(usernameCurrent).get());
     }
 
     @Override
@@ -255,6 +249,16 @@ public class UserServiceImpl  implements UserService {
 
         giraUserRepository.save(user);
 
+    }
+
+    @Override
+    public UserDetailsResponseDTO removeGroup(String idUser, String idGroup) {
+        GiraUser user = serviceUserHelper.getEntityById(idUser, giraUserRepository, errorsUserNotFound);
+        GiraGroup group = serviceGroupHelper.getEntityById(idGroup, giraGroupRepository, errorsGroupNotFound);
+
+        user.removeGroup(group);
+
+        return UserMapper.INSTANCE.toUserDetailsResponseDTO(giraUserRepository.save(user));
     }
     
     

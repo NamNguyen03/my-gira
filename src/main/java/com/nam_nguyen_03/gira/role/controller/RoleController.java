@@ -27,7 +27,7 @@ public class RoleController {
     @Autowired
     private RoleService service;
 
-    @GiraPermission("addRole")
+    // @GiraPermission("addRole")
     @PostMapping
     public Object addRole(@Valid @RequestBody RoleDTO role, BindingResult result){
         
@@ -62,7 +62,7 @@ public class RoleController {
         return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
     }
 
-    @GiraPermission("insertProgramRole")
+    // @GiraPermission("insertProgramRole")
     @PostMapping("{idRole}/{idProgram}")
     public Object insertProgram(@PathVariable("idRole") String idRole, @PathVariable("idProgram") String idProgram){
         RoleResponseDTO rp = service.insertProgram(idRole, idProgram);

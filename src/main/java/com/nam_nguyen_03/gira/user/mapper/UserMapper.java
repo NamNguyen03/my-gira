@@ -3,6 +3,7 @@ package com.nam_nguyen_03.gira.user.mapper;
 import javax.validation.Valid;
 
 import com.nam_nguyen_03.gira.security.dto.RegisterDTO;
+import com.nam_nguyen_03.gira.user.dto.UserDetailsResponseDTO;
 import com.nam_nguyen_03.gira.user.dto.UserResponseDTO;
 import com.nam_nguyen_03.gira.user.model.GiraUser;
 
@@ -15,5 +16,7 @@ public interface UserMapper {
 
     GiraUser toModel(@Valid RegisterDTO rq);
 
-    UserResponseDTO toUserResponseDTO(GiraUser save);
+    UserResponseDTO toUserResponseDTO(GiraUser user);
+
+    UserDetailsResponseDTO toUserDetailsResponseDTO(GiraUser user);
 }

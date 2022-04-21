@@ -7,13 +7,17 @@ import com.nam_nguyen_03.gira.common.model.PageResponseModel;
 import com.nam_nguyen_03.gira.common.util.ResponseHelper;
 import com.nam_nguyen_03.gira.role.dto.ProgramDTO;
 import com.nam_nguyen_03.gira.role.dto.ProgramResponseDTO;
+import com.nam_nguyen_03.gira.role.dto.UpdateProgramDTO;
 import com.nam_nguyen_03.gira.role.service.ProgramService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -58,4 +62,23 @@ public class ProgramController {
         return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
     }
 
+    @DeleteMapping("{id}")
+    public Object deleteProgram(@PathVariable("id") String id){
+
+        service.deleteById(id);
+
+        return ResponseHelper.getResponse("", HttpStatus.OK, false);
+    }
+
+    @PutMapping("{id}")
+    public Object updateProgram(@PathVariable("id") String id, 
+        @RequestBody UpdateProgramDTO program, 
+        BindingResult result){
+
+        
+        
+        ProgramResponseDTO rp  = service.update(id, program);
+
+        return ResponseHelper.getResponse(rp, HttpStatus.OK, false);
+    }
 }

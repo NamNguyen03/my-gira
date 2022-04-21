@@ -59,4 +59,9 @@ public class GiraUser extends BaseEntity {
 		groups.add(group);
 		group.getUsers().add(this);
 	}
+
+	public void removeGroup( GiraGroup group ) {
+		groups.remove(group);
+		group.getUsers().remove(this);
+	}
 }
